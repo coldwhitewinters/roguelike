@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import TypeVar
 
 
-class Component:
+class Component(ABC):
     """Base class for all components."""
     pass
 
@@ -39,12 +39,21 @@ class Entity:
         self._components.pop(component_type, None)
 
 
+class System(ABC):
+    """Base class for all systems."""
+
+    @abstractmethod
+    def update(self, world: 'World', *args, **kwargs) -> None:
+        """Update the system. Called every frame."""
+        pass
+
+
 class World:
     """Container for all entities and systems."""
 
     def __init__(self, template_manager=None):
         self.entities: list[Entity] = []
-        self.systems: list['System'] = []
+        self.systems: list[System] = []
         self.template_manager = template_manager
 
     def create_entity(self, template: str = None, **params) -> Entity:
@@ -66,7 +75,7 @@ class World:
 
         return entity
 
-    def add_system(self, system: 'System') -> None:
+    def add_system(self, system: System) -> None:
         """Add a system to the world."""
         self.systems.append(system)
 
@@ -78,12 +87,3 @@ class World:
     def get_entities_with_component(self, component_type: type[C]) -> list[Entity]:
         """Get all entities that have a specific component type."""
         return [e for e in self.entities if e.has_component(component_type)]
-
-
-class System(ABC):
-    """Base class for all systems."""
-
-    @abstractmethod
-    def update(self, world: World, *args, **kwargs) -> None:
-        """Update the system. Called every frame."""
-        pass
