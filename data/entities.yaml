@@ -1,0 +1,28 @@
+# Entity templates for the roguelike game
+# Each template defines components that will be added to entities
+
+floor:
+  components:
+    - type: Position
+      # x and y will be provided at spawn time
+    - type: Renderable
+      char: "."
+      fg: [100, 100, 100]
+
+wall:
+  components:
+    - type: Position
+      # x and y will be provided at spawn time
+    - type: Renderable
+      char: "#"
+      fg: [200, 200, 200]
+    - type: BlocksMovement
+
+player:
+  components:
+    - type: Position
+      # x and y will be provided at spawn time
+    - type: Renderable
+      char: "@"
+      fg: [255, 255, 255]
+    - type: Player
