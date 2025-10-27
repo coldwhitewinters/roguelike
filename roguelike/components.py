@@ -10,17 +10,6 @@ class Component(ABC):
     pass
 
 
-class GridComponent(Component):
-    """Component that holds a 2D grid of tiles."""
-
-    def __init__(self, width: int, height: int):
-        self.width = width
-        self.height = height
-        # Initialize with floor tiles (walkable)
-        # 0 = floor, 1 = wall
-        self.tiles: NDArray[np.int8] = np.zeros((height, width), dtype=np.int8)
-
-
 class PositionComponent(Component):
     """Component for entity position in the world."""
 
