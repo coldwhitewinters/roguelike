@@ -9,6 +9,7 @@ if TYPE_CHECKING:
      from src.systems import System
      from src.components import Component
      C = TypeVar('C', bound=Component)
+     S = TypeVar('S', bound=System)
 
 
 class World:
@@ -31,16 +32,30 @@ class World:
         entity = Entity(name, **kwargs)        
         self.entities.append(entity)
         return entity
+    
+    def get_entities_with_component(self, component_type: type[C]) -> list[Entity]:
+        """Get all entities that have a specific component type."""
+        return [e for e in self.entities if e.has_component(component_type)]
 
     def add_system(self, system: System) -> None:
         """Add a system to the world."""
         self.systems.append(system)
 
+    def get_system(self, system_type: type[S]) -> S | None:
+        """Get a system of the specified type.
+
+        Args:
+            system_type: The type of system to retrieve
+
+        Returns:
+            The system instance if found, None otherwise
+        """
+        for system in self.systems:
+            if isinstance(system, system_type):
+                return system
+        return None
+
     def update(self, *args, **kwargs) -> None:
         """Update all systems."""
         for system in self.systems:
             system.update(self, *args, **kwargs)
-
-    def get_entities_with_component(self, component_type: type[C]) -> list[Entity]:
-        """Get all entities that have a specific component type."""
-        return [e for e in self.entities if e.has_component(component_type)]

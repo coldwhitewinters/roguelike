@@ -4,7 +4,22 @@ import tcod
 
 from src.world import World
 from src.systems import RenderSystem, InputSystem
-from src.map_generation import generate_map
+from src.map import generate_map
+
+
+def initialize_systems(world: World, console: tcod.console.Console, map_width: int, map_height: int) -> None:
+    """Initialize and add game systems to the world.
+
+    Args:
+        world: The ECS world to add systems to
+        console: The console for rendering
+        map_width: Width of the map
+        map_height: Height of the map
+    """
+    input_system = InputSystem(map_width, map_height)
+    render_system = RenderSystem(console)
+    world.add_system(input_system)
+    world.add_system(render_system)
 
 
 def main():
@@ -35,11 +50,8 @@ def main():
     # Create the console
     console = tcod.console.Console(screen_width, screen_height, order="F")
 
-    # Create and add systems
-    input_system = InputSystem(map_width, map_height)
-    render_system = RenderSystem(console)
-    world.add_system(input_system)
-    world.add_system(render_system)
+    # Initialize game systems
+    initialize_systems(world, console, map_width, map_height)
 
     # Create the context (window)
     with tcod.context.new(
@@ -54,7 +66,7 @@ def main():
         while running:
             # Render
             console.clear()
-            render_system.update(world)
+            world.get_system(RenderSystem).update(world)
 
             # Draw UI separator and instructions
             console.print(0, map_height, "-" * screen_width, fg=(150, 150, 150))
@@ -72,7 +84,7 @@ def main():
                         running = False
                     else:
                         # Pass key event to input system
-                        input_system.update(world, event)
+                        world.get_system(InputSystem).update(world, event)
 
 
 if __name__ == "__main__":
