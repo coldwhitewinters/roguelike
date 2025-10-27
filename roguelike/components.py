@@ -1,8 +1,6 @@
 """Components for the roguelike game."""
 from __future__ import annotations
 from abc import ABC
-import numpy as np
-from numpy.typing import NDArray
 
 
 class Component(ABC):
