@@ -32,3 +32,15 @@ class PlayerComponent(Component):
 class BlocksMovementComponent(Component):
     """Tag component for entities that block movement (walls, etc.)."""
     pass
+
+
+class StairComponent(Component):
+    """Component for stairs that allow level transition."""
+
+    def __init__(self, direction: str):
+        """Initialize a stair component.
+
+        Args:
+            direction: Either 'up' or 'down'
+        """
+        self.direction = direction

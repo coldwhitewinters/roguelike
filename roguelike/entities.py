@@ -11,6 +11,7 @@ from roguelike.components import (
     RenderableComponent,
     PlayerComponent,
     BlocksMovementComponent,
+    StairComponent,
 )
 
 
@@ -95,6 +96,10 @@ class Entity:
 
         elif component_type == 'BlocksMovement':
             self.add_component(BlocksMovementComponent())
+
+        elif component_type == 'Stair':
+            direction = component_def.get('direction', 'down')
+            self.add_component(StairComponent(direction=direction))
 
         else:
             raise ValueError(f"Unknown component type: {component_type}")

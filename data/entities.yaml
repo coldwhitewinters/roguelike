@@ -26,3 +26,23 @@ player:
       char: "@"
       fg: [255, 255, 255]
     - type: Player
+
+upstairs:
+  components:
+    - type: Position
+      # x and y will be provided at spawn time
+    - type: Renderable
+      char: "<"
+      fg: [255, 255, 100]
+    - type: Stair
+      direction: up
+
+downstairs:
+  components:
+    - type: Position
+      # x and y will be provided at spawn time
+    - type: Renderable
+      char: ">"
+      fg: [255, 255, 100]
+    - type: Stair
+      direction: down

@@ -1,44 +1,61 @@
-"""Entity-Component-System framework for the roguelike game."""
+"""World class for managing multiple levels and game systems."""
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from roguelike.entities import Entity
+from roguelike.level import Level
 
 if TYPE_CHECKING:
-     from typing import TypeVar
-     from roguelike.systems import System
-     from roguelike.components import Component
-     C = TypeVar('C', bound=Component)
-     S = TypeVar('S', bound=System)
+    from typing import TypeVar
+    from roguelike.systems import System
+    S = TypeVar('S', bound=System)
 
 
 class World:
-    """Container for all entities and systems."""
+    """Container for all levels and systems."""
 
     def __init__(self):
-        self.entities: list[Entity] = []
+        self.levels: list[Level] = []
         self.systems: list[System] = []
+        self.active_level_index: int = 0
+        self.transition_request: str | None = None  # 'up', 'down', or None
 
-    def create_entity(self, name: str | None = None, **kwargs) -> Entity:
-        """Create a new entity and add it to the world.
+    def add_level(self, level: Level) -> None:
+        """Add a level to the world.
 
         Args:
-            template: Optional template name to apply to the entity
-            **params: Parameters to pass to the template (e.g., x, y for position)
+            level: The level to add
+        """
+        self.levels.append(level)
+
+    def get_active_level(self) -> Level | None:
+        """Get the currently active level.
 
         Returns:
-            The created entity
+            The active level, or None if no levels exist
         """
-        entity = Entity(name, **kwargs)        
-        self.entities.append(entity)
-        return entity
-    
-    def get_entities_with_component(self, component_type: type[C]) -> list[Entity]:
-        """Get all entities that have a specific component type."""
-        return [e for e in self.entities if e.has_component(component_type)]
+        if 0 <= self.active_level_index < len(self.levels):
+            return self.levels[self.active_level_index]
+        return None
+
+    def set_active_level(self, index: int) -> None:
+        """Set the active level by index.
+
+        Args:
+            index: The index of the level to activate
+
+        Raises:
+            IndexError: If the index is out of bounds
+        """
+        if not 0 <= index < len(self.levels):
+            raise IndexError(f"Level index {index} out of bounds (0-{len(self.levels)-1})")
+        self.active_level_index = index
 
     def add_system(self, system: System) -> None:
-        """Add a system to the world."""
+        """Add a system to the world.
+
+        Args:
+            system: The system to add
+        """
         self.systems.append(system)
 
     def get_system(self, system_type: type[S]) -> S | None:
@@ -55,7 +72,18 @@ class World:
                 return system
         return None
 
-    def update(self, *args, **kwargs) -> None:
-        """Update all systems."""
+    def update(self) -> None:
+        """Update all frame-based systems."""
         for system in self.systems:
-            system.update(self, *args, **kwargs)
+            system.update(self)
+
+    def handle_input(self, event) -> None:
+        """Handle input events for input-based systems.
+
+        Args:
+            event: The input event to process
+        """
+        from roguelike.systems import InputSystem
+        for system in self.systems:
+            if isinstance(system, InputSystem):
+                system.update(self, event)
