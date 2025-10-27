@@ -2,9 +2,9 @@
 """Main entry point for the roguelike game."""
 import tcod
 
-from src.world import World
-from src.systems import RenderSystem, InputSystem
-from src.map import generate_map
+from roguelike.world import World
+from roguelike.systems import RenderSystem, InputSystem
+from roguelike.map import generate_map
 
 
 def initialize_systems(world: World, console: tcod.console.Console, map_width: int, map_height: int) -> None:

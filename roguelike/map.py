@@ -1,6 +1,6 @@
 """Map generation functions for the roguelike game."""
 import random
-from src.world import World
+from roguelike.world import World
 
 
 def generate_map(world: World, map_width: int, map_height: int, player_x: int, player_y: int) -> None:

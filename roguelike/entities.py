@@ -5,7 +5,7 @@ from typing import Any, TypeVar
 import yaml
 from pathlib import Path
 
-from src.components import (
+from roguelike.components import (
     Component,
     PositionComponent,
     RenderableComponent,

@@ -2,12 +2,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from src.entities import Entity
+from roguelike.entities import Entity
 
 if TYPE_CHECKING:
      from typing import TypeVar
-     from src.systems import System
-     from src.components import Component
+     from roguelike.systems import System
+     from roguelike.components import Component
      C = TypeVar('C', bound=Component)
      S = TypeVar('S', bound=System)
 

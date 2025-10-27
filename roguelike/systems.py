@@ -5,16 +5,16 @@ from typing import TYPE_CHECKING
 import tcod
 from abc import ABC, abstractmethod
 
-from src.components import (
-    PositionComponent, 
-    RenderableComponent, 
-    PlayerComponent, 
+from roguelike.components import (
+    PositionComponent,
+    RenderableComponent,
+    PlayerComponent,
     BlocksMovementComponent
 )
 
 
 if TYPE_CHECKING:
-    from src.world import World
+    from roguelike.world import World
 
 
 class System(ABC):
