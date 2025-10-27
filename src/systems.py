@@ -1,8 +1,29 @@
 """Systems for the roguelike game."""
-import tcod
+from __future__ import annotations
+from typing import TYPE_CHECKING
 
-from src.ecs import System, World
-from src.components import PositionComponent, RenderableComponent, PlayerComponent, BlocksMovementComponent
+import tcod
+from abc import ABC, abstractmethod
+
+from src.components import (
+    PositionComponent, 
+    RenderableComponent, 
+    PlayerComponent, 
+    BlocksMovementComponent
+)
+
+
+if TYPE_CHECKING:
+    from src.world import World
+
+
+class System(ABC):
+    """Base class for all systems."""
+
+    @abstractmethod
+    def update(self, world: World, *args, **kwargs) -> None:
+        """Update the system. Called every frame."""
+        pass
 
 
 class RenderSystem(System):

@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """Main entry point for the roguelike game."""
-import random
 import tcod
 
-from src.ecs import World
-from src.templates import EntityTemplateManager
+from src.world import World
 from src.systems import RenderSystem, InputSystem
+from src.map_generation import generate_map
 
 
 def main():
@@ -19,52 +18,19 @@ def main():
 
     # Load the tileset
     tileset = tcod.tileset.load_tilesheet(
-        "data/dejavu10x10_gs_tc.png",
+        "fonts/dejavu10x10_gs_tc.png",
         32,
         8,
         tcod.tileset.CHARMAP_TCOD
     )
 
-    # Load entity templates
-    template_manager = EntityTemplateManager()
-    template_manager.load_templates("data/entities.yaml")
+    # Create the ECS world
+    world = World()
 
-    # Create the ECS world with template manager
-    world = World(template_manager=template_manager)
-
-    # Create floor tile entities for the entire map
-    for y in range(map_height):
-        for x in range(map_width):
-            world.create_entity("floor", x=x, y=y)
-
-    # Create wall entities around the map border
-    for x in range(map_width):
-        # Top wall
-        world.create_entity("wall", x=x, y=0)
-        # Bottom wall
-        world.create_entity("wall", x=x, y=map_height - 1)
-
-    for y in range(map_height):
-        # Left wall
-        world.create_entity("wall", x=0, y=y)
-        # Right wall
-        world.create_entity("wall", x=map_width - 1, y=y)
-
-    # Create random walls inside the map for testing
-    num_random_walls = 100
-    for _ in range(num_random_walls):
-        # Generate random position inside the map (not on border)
-        x = random.randint(1, map_width - 2)
-        y = random.randint(1, map_height - 2)
-
-        # Skip player starting position
-        if x == map_width // 2 and y == map_height // 2:
-            continue
-
-        world.create_entity("wall", x=x, y=y)
-
-    # Create the player entity
-    world.create_entity("player", x=map_width // 2, y=map_height // 2)
+    # Generate the map with floor tiles, walls, and player
+    player_x = map_width // 2
+    player_y = map_height // 2
+    generate_map(world, map_width, map_height, player_x, player_y)
 
     # Create the console
     console = tcod.console.Console(screen_width, screen_height, order="F")

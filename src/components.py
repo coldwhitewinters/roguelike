@@ -1,8 +1,13 @@
 """Components for the roguelike game."""
+from __future__ import annotations
+from abc import ABC
 import numpy as np
 from numpy.typing import NDArray
 
-from src.ecs import Component
+
+class Component(ABC):
+    """Base class for all components."""
+    pass
 
 
 class GridComponent(Component):
