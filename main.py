@@ -2,23 +2,24 @@
 """Main entry point for the roguelike game."""
 import tcod
 
-from src.world import World
-from src.systems import RenderSystem, InputSystem
-from src.map import generate_map
+from roguelike.world import World
+from roguelike.level import Level
+from roguelike.systems import RenderSystem, InputSystem, LevelTransitionSystem
+from roguelike.map import generate_map
 
 
-def initialize_systems(world: World, console: tcod.console.Console, map_width: int, map_height: int) -> None:
+def initialize_systems(world: World, console: tcod.console.Console) -> None:
     """Initialize and add game systems to the world.
 
     Args:
         world: The ECS world to add systems to
         console: The console for rendering
-        map_width: Width of the map
-        map_height: Height of the map
     """
-    input_system = InputSystem(map_width, map_height)
+    input_system = InputSystem()
+    level_transition_system = LevelTransitionSystem()
     render_system = RenderSystem(console)
     world.add_system(input_system)
+    world.add_system(level_transition_system)
     world.add_system(render_system)
 
 
@@ -42,16 +43,24 @@ def main():
     # Create the ECS world
     world = World()
 
-    # Generate the map with floor tiles, walls, and player
+    # Create the first level (depth 0)
+    level_1 = Level(width=map_width, height=map_height, depth=0)
     player_x = map_width // 2
     player_y = map_height // 2
-    generate_map(world, map_width, map_height, player_x, player_y)
+    generate_map(level_1, map_width, map_height, player_x, player_y, has_downstairs=True)
+    world.add_level(level_1)
+
+    # Create the second level (depth 1)
+    level_2 = Level(width=map_width, height=map_height, depth=1)
+    # Player won't start on level 2, so we don't create a player entity
+    generate_map(level_2, map_width, map_height, map_width // 2, map_height // 2, has_upstairs=True, create_player=False)
+    world.add_level(level_2)
 
     # Create the console
     console = tcod.console.Console(screen_width, screen_height, order="F")
 
     # Initialize game systems
-    initialize_systems(world, console, map_width, map_height)
+    initialize_systems(world, console)
 
     # Create the context (window)
     with tcod.context.new(
@@ -64,13 +73,17 @@ def main():
         # Main game loop
         running = True
         while running:
-            # Render
-            console.clear()
-            world.get_system(RenderSystem).update(world)
+            # Update all frame-based systems (including rendering)
+            world.update()
 
             # Draw UI separator and instructions
             console.print(0, map_height, "-" * screen_width, fg=(150, 150, 150))
-            console.print(0, map_height + 1, "Press ESC to quit | hjkl to move", fg=(200, 200, 200))
+
+            # Get current floor for display
+            active_level = world.get_active_level()
+            floor_text = f"Floor: {active_level.depth}" if active_level else "Floor: ?"
+
+            console.print(0, map_height + 1, f"{floor_text} | ESC: quit | hjkl: move | <>: stairs", fg=(200, 200, 200))
 
             # Present the console to the screen
             context.present(console)
@@ -83,8 +96,8 @@ def main():
                     if event.sym == tcod.event.KeySym.ESCAPE:
                         running = False
                     else:
-                        # Pass key event to input system
-                        world.get_system(InputSystem).update(world, event)
+                        # Pass key event to input systems
+                        world.handle_input(event)
 
 
 if __name__ == "__main__":

@@ -1,24 +1,11 @@
 """Components for the roguelike game."""
 from __future__ import annotations
 from abc import ABC
-import numpy as np
-from numpy.typing import NDArray
 
 
 class Component(ABC):
     """Base class for all components."""
     pass
-
-
-class GridComponent(Component):
-    """Component that holds a 2D grid of tiles."""
-
-    def __init__(self, width: int, height: int):
-        self.width = width
-        self.height = height
-        # Initialize with floor tiles (walkable)
-        # 0 = floor, 1 = wall
-        self.tiles: NDArray[np.int8] = np.zeros((height, width), dtype=np.int8)
 
 
 class PositionComponent(Component):
@@ -45,3 +32,15 @@ class PlayerComponent(Component):
 class BlocksMovementComponent(Component):
     """Tag component for entities that block movement (walls, etc.)."""
     pass
+
+
+class StairComponent(Component):
+    """Component for stairs that allow level transition."""
+
+    def __init__(self, direction: str):
+        """Initialize a stair component.
+
+        Args:
+            direction: Either 'up' or 'down'
+        """
+        self.direction = direction
