@@ -52,8 +52,8 @@ def main():
 
     # Create the second level (depth 1)
     level_2 = Level(width=map_width, height=map_height, depth=1)
-    # Player won't start on level 2, so we just need a placeholder position
-    generate_map(level_2, map_width, map_height, map_width // 2, map_height // 2, has_upstairs=True)
+    # Player won't start on level 2, so we don't create a player entity
+    generate_map(level_2, map_width, map_height, map_width // 2, map_height // 2, has_upstairs=True, create_player=False)
     world.add_level(level_2)
 
     # Create the console
@@ -74,12 +74,16 @@ def main():
         running = True
         while running:
             # Update all frame-based systems (including rendering)
-            console.clear()
             world.update()
 
             # Draw UI separator and instructions
             console.print(0, map_height, "-" * screen_width, fg=(150, 150, 150))
-            console.print(0, map_height + 1, "ESC: quit | hjkl: move | <>: stairs", fg=(200, 200, 200))
+
+            # Get current floor for display
+            active_level = world.get_active_level()
+            floor_text = f"Floor: {active_level.depth}" if active_level else "Floor: ?"
+
+            console.print(0, map_height + 1, f"{floor_text} | ESC: quit | hjkl: move | <>: stairs", fg=(200, 200, 200))
 
             # Present the console to the screen
             context.present(console)

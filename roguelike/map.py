@@ -12,7 +12,8 @@ def generate_map(
     has_upstairs: bool = False,
     has_downstairs: bool = False,
     upstairs_pos: tuple[int, int] | None = None,
-    downstairs_pos: tuple[int, int] | None = None
+    downstairs_pos: tuple[int, int] | None = None,
+    create_player: bool = True
 ) -> None:
     """Generate a basic map with floors, walls, and random obstacles.
 
@@ -26,6 +27,7 @@ def generate_map(
         has_downstairs: Whether to place downstairs
         upstairs_pos: Position for upstairs (if None, will be randomly placed)
         downstairs_pos: Position for downstairs (if None, will be randomly placed)
+        create_player: Whether to create the player entity (default True)
     """
     # Create floor tile entities for the entire map
     for y in range(map_height):
@@ -88,5 +90,6 @@ def generate_map(
 
         level.create_entity("wall", x=x, y=y)
 
-    # Create the player entity
-    level.create_entity("player", x=player_x, y=player_y)
+    # Create the player entity (only if requested)
+    if create_player:
+        level.create_entity("player", x=player_x, y=player_y)

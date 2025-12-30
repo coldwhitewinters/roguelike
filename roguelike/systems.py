@@ -170,16 +170,22 @@ class InputSystem(System):
         if position is None:
             return
 
-        # Check both KeySym and scancode for letter keys
-        key_char = chr(event.sym) if event.sym < 128 else None
+        # Check for shift modifier
+        shift_held = event.mod & (tcod.event.Modifier.LSHIFT | tcod.event.Modifier.RSHIFT)
 
         # Handle stair transition requests
-        if key_char == '>':
-            world.transition_request = 'down'
-            return
-        elif key_char == '<':
-            world.transition_request = 'up'
-            return
+        # On some keyboards, < and > share the same key, so we check the sym for '<' (60)
+        # and use the shift modifier to distinguish between them
+        if event.sym == 60:  # '<' character
+            if shift_held:
+                world.transition_request = 'down'
+                return
+            else:
+                world.transition_request = 'up'
+                return
+
+        # Get key character for movement
+        key_char = chr(event.sym) if event.sym < 128 else None
 
         # Vim-style movement keys
         dx, dy = 0, 0
