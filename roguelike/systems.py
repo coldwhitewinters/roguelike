@@ -187,7 +187,7 @@ class InputSystem(System):
         # Get key character for movement
         key_char = chr(event.sym) if event.sym < 128 else None
 
-        # Vim-style movement keys
+        # Vim-style movement keys (including diagonals)
         dx, dy = 0, 0
         if key_char == 'h':  # Left
             dx = -1
@@ -197,6 +197,18 @@ class InputSystem(System):
             dy = -1
         elif key_char == 'l':  # Right
             dx = 1
+        elif key_char == 'y':  # Up-left
+            dx = -1
+            dy = -1
+        elif key_char == 'u':  # Up-right
+            dx = 1
+            dy = -1
+        elif key_char == 'b':  # Down-left
+            dx = -1
+            dy = 1
+        elif key_char == 'n':  # Down-right
+            dx = 1
+            dy = 1
 
         # Calculate new position
         new_x = position.x + dx
