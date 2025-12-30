@@ -83,7 +83,7 @@ def main():
             active_level = world.get_active_level()
             floor_text = f"Floor: {active_level.depth}" if active_level else "Floor: ?"
 
-            console.print(0, map_height + 1, f"{floor_text} | ESC: quit | hjkl: move | <>: stairs", fg=(200, 200, 200))
+            console.print(0, map_height + 1, f"{floor_text} | ESC: quit | hjkl/yubn: move | <>: stairs", fg=(200, 200, 200))
 
             # Present the console to the screen
             context.present(console)
