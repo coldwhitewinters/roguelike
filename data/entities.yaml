@@ -46,3 +46,37 @@ downstairs:
       fg: [255, 255, 100]
     - type: Stair
       direction: down
+
+grass:
+  components:
+    - type: Position
+      # x and y will be provided at spawn time
+    - type: Renderable
+      char: "\""
+      fg: [34, 139, 34]  # Forest green
+
+water:
+  components:
+    - type: Position
+      # x and y will be provided at spawn time
+    - type: Renderable
+      char: "~"
+      fg: [30, 144, 255]  # Dodger blue
+    - type: BlocksMovement
+
+trees:
+  components:
+    - type: Position
+      # x and y will be provided at spawn time
+    - type: Renderable
+      char: "T"
+      fg: [0, 100, 0]  # Dark green
+    - type: BlocksMovement
+
+dirt:
+  components:
+    - type: Position
+      # x and y will be provided at spawn time
+    - type: Renderable
+      char: ":"
+      fg: [139, 90, 43]  # Saddle brown
