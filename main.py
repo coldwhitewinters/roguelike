@@ -24,20 +24,25 @@ def initialize_systems(world: World, console: tcod.console.Console) -> None:
 
 
 def main():
-    # Map dimensions
-    map_width = 80
-    map_height = 45
+    # Map dimensions (independent of screen size)
+    map_width = 100
+    map_height = 55
 
-    # Screen dimensions
-    screen_width = 80
-    screen_height = 50
+    # Console/viewport dimensions (what you see on screen)
+    console_width = 100
+    console_height = 60
 
-    # Load the tileset
+    # Set nearest-neighbor filtering for sharp, pixel-perfect rendering
+    # CRITICAL: Must be called BEFORE creating the context
+    tcod.lib.SDL_SetHint(b"SDL_RENDER_SCALE_QUALITY", b"0")
+
+    # Load bitmap tileset for crisp, pixel-perfect rendering (like NetHack/DCSS)
+    # Using pre-rendered bitmap instead of TrueType to avoid scaling artifacts
     tileset = tcod.tileset.load_tilesheet(
-        "fonts/dejavu10x10_gs_tc.png",
-        32,
-        8,
-        tcod.tileset.CHARMAP_TCOD
+        "fonts/dejavu16x16_gs_tc.png",
+        columns=32,
+        rows=8,
+        charmap=tcod.tileset.CHARMAP_TCOD
     )
 
     # Create the ECS world
@@ -57,18 +62,19 @@ def main():
     world.add_level(level_2)
 
     # Create the console
-    console = tcod.console.Console(screen_width, screen_height, order="F")
+    console = tcod.console.Console(console_width, console_height, order="F")
 
     # Initialize game systems
     initialize_systems(world, console)
 
-    # Create the context (window)
+    # Create the context (window) - resizable with smooth vector font scaling
     with tcod.context.new(
         columns=console.width,
         rows=console.height,
         tileset=tileset,
         title="Roguelike",
         vsync=True,
+        sdl_window_flags=tcod.context.SDL_WINDOW_RESIZABLE,
     ) as context:
         # Main game loop
         running = True
@@ -77,7 +83,7 @@ def main():
             world.update()
 
             # Draw UI separator and instructions
-            console.print(0, map_height, "-" * screen_width, fg=(150, 150, 150))
+            console.print(0, map_height, "-" * console_width, fg=(150, 150, 150))
 
             # Get current floor for display
             active_level = world.get_active_level()
@@ -85,8 +91,13 @@ def main():
 
             console.print(0, map_height + 1, f"{floor_text} | ESC: quit | hjkl/yubn: move | <>: stairs", fg=(200, 200, 200))
 
-            # Present the console to the screen
-            context.present(console)
+            # Present the console to the screen with pixel-perfect scaling
+            context.present(
+                console,
+                integer_scaling=True,  # Prevents sub-pixel distortion
+                keep_aspect=True,      # Maintains aspect ratio with letterbox
+                clear_color=(0, 0, 0)  # Black letterbox borders
+            )
 
             # Handle input
             for event in tcod.event.wait():
